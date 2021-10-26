@@ -3,6 +3,8 @@ import json
 import numpy as np
 import cv2 as cv
 from datetime import datetime
+import glob
+import os
 
 class NumpyEncoder(json.JSONEncoder):
     """ Special json encoder for numpy types """
@@ -17,15 +19,20 @@ class NumpyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def conv_to_np(coefs):
-    for key in coefs:
-        if isinstance(coefs[key], int):
-            coefs[key] = np.int(coefs[key])
-        elif isinstance(coefs[key], float):
-            coefs[key] = np.float(coefs[key])
-        elif isinstance(coefs[key], list):
-            coefs[key] = np.array(coefs[key])
-    return coefs
+def conv_to_np(coef):
+    for ind, coefs in coef.items():
+
+        if coefs is None:
+            continue
+        for key in coefs:
+
+            if isinstance(coefs[key], int):
+                coefs[key] = np.int(coefs[key])
+            elif isinstance(coefs[key], float):
+                coefs[key] = np.float(coefs[key])
+            elif isinstance(coefs[key], list):
+                coefs[key] = np.array(coefs[key])
+    return coef
 
 
 class MainClass:
@@ -51,6 +58,8 @@ class MainClass:
         self.path_save = ''
         self.path_load = ''
 
+        self.path_colibr_frames = ''
+
         # self.name_seved = 'save_coefs_'
 
 
@@ -68,6 +77,7 @@ class MainClass:
         if not self.path_4 == '':
             print('f 4')
             self.start_video_col_4()
+        
         print('=================================================')
         self.print_info()
 
@@ -153,13 +163,14 @@ class MainClass:
     def chose_path_1(self):
 
         try:
+            print('---')
             self.path_1 = QtWidgets.QFileDialog.getOpenFileName()[0]
             # memory.paths[0] = self.path
             self.obj.label_path_1.setText(str(self.path_1))
             # print('path:' ,memory.paths[0])
 
-        except:
-            pass
+        except TypeError:
+            print('help')
 
     def chose_path_2(self):
 
@@ -169,7 +180,7 @@ class MainClass:
             self.obj.label_path_2.setText(str(self.path_2))
             # print('path:' ,memory.paths[0])
 
-        except:
+        except TypeError:
             pass
 
     def chose_path_3(self):
@@ -180,7 +191,7 @@ class MainClass:
             self.obj.label_path_3.setText(str(self.path_3))
             # print('path:' ,memory.paths[0])
 
-        except:
+        except TypeError:
             pass
 
     def chose_path_4(self):
@@ -191,7 +202,7 @@ class MainClass:
             self.obj.label_path_4.setText(str(self.path_4))
             # print('path:' ,memory.paths[0])
 
-        except:
+        except TypeError:
             pass
 
     def print_info(self):
@@ -223,6 +234,7 @@ class MainClass:
 
     def load_path(self):
         try:
+            print('in')
             self.path_load = QtWidgets.QFileDialog.getOpenFileName()[0]
             coefs = self.read_coefs()
             self.coefs_1 = coefs['coefs_1']
@@ -230,5 +242,53 @@ class MainClass:
             self.coefs_3 = coefs['coefs_3']
             self.coefs_4 = coefs['coefs_4']
             print(coefs)
+        except:
+            pass
+
+
+    def get_path_colibr_frames(self):
+        try:
+            self.path_colibr_frames = QtWidgets.QFileDialog.getExistingDirectory()#[0]
+            self.obj.label_path_foto.setText(str(self.path_colibr_frames))
+            if not os.path.exists(self.path_colibr_frames+'/colibrate'):
+                os.mkdir(self.path_colibr_frames+'/colibrate')
+            # self.save_coefs()
         except TypeError:
             pass
+
+
+
+    def calibr_frames(self):
+        images_jpg = glob.glob(self.path_colibr_frames+'/*.jpg')
+        images_png = glob.glob(self.path_colibr_frames + '/*.png')
+        images = []
+        images.extend(images_jpg)
+        images.extend(images_png)
+        print(images)
+        counter_foto = 0
+        for image in images:
+            counter_foto+=1
+            image = image.replace('/','\\')
+            print(image)
+            img = cv.imread(image)
+            # print(img)
+            # gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+            # print(len(gray))
+            new_image = self.colibr_foto(img)
+            print('new image')
+            new_path = self.path_colibr_frames+'/colibrate/' +'calib'+datetime.now().strftime("%Y_%m_%d_%H_%M_%S")+str(counter_foto)+'.jpg'
+            print(new_path)
+            cv.imwrite(new_path, new_image)
+
+    def colibr_foto(self,img):
+        print('in colibr')
+        h, w = img.shape[:2]
+        print(img.shape[:2])
+        # print(type(self.coefs_1['cameraMatrix']), type(self.coefs_1['dist']))
+
+        newCameraMatrix, roi = cv.getOptimalNewCameraMatrix(self.coefs_1['cameraMatrix'], self.coefs_1['dist'], (w, h), 1, (w, h))
+
+        # print(newCameraMatrix, roi)
+        dst = cv.undistort(img, self.coefs_1['cameraMatrix'], self.coefs_1['dist'], None, newCameraMatrix)
+        # print(dst)
+        return dst
