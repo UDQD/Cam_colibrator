@@ -16,8 +16,14 @@ if __name__ == "__main__":
     ui.pushButton_koef.clicked.connect(cl.main_video_col)
     ui.pushButton_save.clicked.connect(cl.save_path)
     ui.pushButton_load.clicked.connect(cl.load_path)
+
     ui.pushButton_path_foto.clicked.connect(cl.get_path_colibr_frames)
     ui.pushButton_cal_foto.clicked.connect(cl.calibr_frames)
+
+    ui.pushButton_path_video.clicked.connect(cl.get_path_colibr_viseos)
+    ui.pushButton_cal_video.clicked.connect(cl.calibr_videos)
+
+    # ui.widget.
 
 
 

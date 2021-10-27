@@ -9,12 +9,12 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from mainclass import MainClass
+
 
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(1236, 729)
+        Dialog.resize(1219, 729)
         Dialog.setStyleSheet("background-color: rgb(200, 200, 200);\n"
 "background-color: rgb(140, 140, 140);")
         self.pushButton_koef = QtWidgets.QPushButton(Dialog)
@@ -146,6 +146,16 @@ class Ui_Dialog(object):
         self.widget_3.setGeometry(QtCore.QRect(370, 280, 411, 261))
         self.widget_3.setStyleSheet("background-color: rgb(60, 60, 60);")
         self.widget_3.setObjectName("widget_3")
+        self.spinBox_foto = QtWidgets.QSpinBox(Dialog)
+        self.spinBox_foto.setGeometry(QtCore.QRect(601, 590, 31, 22))
+        self.spinBox_foto.setMinimum(1)
+        self.spinBox_foto.setMaximum(4)
+        self.spinBox_foto.setObjectName("spinBox_foto")
+        self.spinBox_video = QtWidgets.QSpinBox(Dialog)
+        self.spinBox_video.setGeometry(QtCore.QRect(600, 660, 31, 22))
+        self.spinBox_video.setMinimum(1)
+        self.spinBox_video.setMaximum(4)
+        self.spinBox_video.setObjectName("spinBox_video")
 
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -177,6 +187,5 @@ class Ui_Dialog(object):
 #     Dialog = QtWidgets.QDialog()
 #     ui = Ui_Dialog()
 #     ui.setupUi(Dialog)
-#     cl = MainClass(ui)
 #     Dialog.show()
 #     sys.exit(app.exec_())
