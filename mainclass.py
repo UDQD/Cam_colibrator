@@ -62,6 +62,11 @@ class MainClass:
         self.path_colibr_frames = ''
         self.path_colibr_videos = ''
 
+        # self.obj.widget.setPixmap()
+
+        # self.image = cv.imread('C:/Users/qwed1/Desktop/fold/pic_161.jpg')
+
+
         # self.name_seved = 'save_coefs_'
 
 
@@ -88,18 +93,18 @@ class MainClass:
         self.print_info()
 
     def start_video_col_1(self):
-        self.coefs_1 = self.colibr_by_video(self.path_1, self.obj.spinBox_1.value())
+        self.coefs_1 = self.colibr_by_video(self.path_1, self.obj.spinBox_1.value(),self.obj.widget)
 
     def start_video_col_2(self):
-        self.coefs_2 = self.colibr_by_video(self.path_2, self.obj.spinBox_2.value())
+        self.coefs_2 = self.colibr_by_video(self.path_2, self.obj.spinBox_2.value(),self.obj.widget_2)
 
     def start_video_col_3(self):
-        self.coefs_3 = self.colibr_by_video(self.path_3, self.obj.spinBox_3.value())
+        self.coefs_3 = self.colibr_by_video(self.path_3, self.obj.spinBox_3.value(),self.obj.widget_3)
 
     def start_video_col_4(self):
-        self.coefs_4 = self.colibr_by_video(self.path_4, self.obj.spinBox_4.value())
+        self.coefs_4 = self.colibr_by_video(self.path_4, self.obj.spinBox_4.value(),self.obj.widget_4)
 
-    def colibr_by_video(self, path, jump):
+    def colibr_by_video(self, path, jump,widget):
         # self.path = memory.paths[0]
         ### FIND CHESSBOARD CORNERS - OBJECT POINTS AND IMAGE POINTS ###
         # print(self.path)
@@ -142,6 +147,7 @@ class MainClass:
                 if ret == True:
                     print('+')
 
+
                     objpoints.append(objp)
                     corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
                     imgpoints.append(corners)
@@ -154,6 +160,11 @@ class MainClass:
             #             print('-')
             #         print(counter," / 4150")
             #         break
+                image = cv.resize(img, (412, 262))
+                # cv.imshow('Video', self.image)
+                # cv.waitKey(1000)
+                image = QtGui.QImage(image.data, image.shape[1], image.shape[0],QtGui.QImage.Format_RGB888).rgbSwapped()
+                widget.setPixmap(QtGui.QPixmap.fromImage(image))
 
         cv.destroyAllWindows()
         # print(objpoints, imgpoints, frameSize)
@@ -280,6 +291,7 @@ class MainClass:
             coefs = self.coefs_3
         elif value == 4:
             coefs = self.coefs_4
+        print(value)
         counter_foto = 0
         for image in images:
             counter_foto+=1

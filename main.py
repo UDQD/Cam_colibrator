@@ -23,7 +23,7 @@ if __name__ == "__main__":
     ui.pushButton_path_video.clicked.connect(cl.get_path_colibr_viseos)
     ui.pushButton_cal_video.clicked.connect(cl.calibr_videos)
 
-    # ui.widget.
+
 
 
 
