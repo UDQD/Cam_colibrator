@@ -93,23 +93,27 @@ class MainClass:
         self.print_info()
 
     def start_video_col_1(self):
-        self.coefs_1 = self.colibr_by_video(self.path_1, self.obj.spinBox_1.value(),self.obj.widget)
+        self.coefs_1 = self.colibr_by_video(self.path_1, self.obj.spinBox_1.value(),self.obj.widget, self.obj.label_1_num,self.obj.label_states_1,self.obj.label_1__total_frame)
 
     def start_video_col_2(self):
-        self.coefs_2 = self.colibr_by_video(self.path_2, self.obj.spinBox_2.value(),self.obj.widget_2)
+        self.coefs_2 = self.colibr_by_video(self.path_2, self.obj.spinBox_2.value(),self.obj.widget_2, self.obj.label_2_num,self.obj.label_states_2,self.obj.label_2__total_frame)
 
     def start_video_col_3(self):
-        self.coefs_3 = self.colibr_by_video(self.path_3, self.obj.spinBox_3.value(),self.obj.widget_3)
+        self.coefs_3 = self.colibr_by_video(self.path_3, self.obj.spinBox_3.value(),self.obj.widget_3,self.obj.label_3_num,self.obj.label_states_3,self.obj.label_3__total_frame)
 
     def start_video_col_4(self):
-        self.coefs_4 = self.colibr_by_video(self.path_4, self.obj.spinBox_4.value(),self.obj.widget_4)
+        self.coefs_4 = self.colibr_by_video(self.path_4, self.obj.spinBox_4.value(),self.obj.widget_4,self.obj.label_4_num,self.obj.label_states_4,self.obj.label_4__total_frame)
 
-    def colibr_by_video(self, path, jump,widget):
+    def colibr_by_video(self, path, jump, widget, num, stat, tot):
+        stat.setText('Обработка')
+        num.setText(str(0))
+
         # self.path = memory.paths[0]
         ### FIND CHESSBOARD CORNERS - OBJECT POINTS AND IMAGE POINTS ###
         # print(self.path)
         counter = 0
         video_capture = cv.VideoCapture(path)
+        v_size = video_capture.get(cv.CAP_PROP_FRAME_COUNT)
         chessboardSize = (7, 6)
         self.width = 2592
         self.heigh = 1944
@@ -126,11 +130,12 @@ class MainClass:
         # Arrays to store object points and image points from all the images.
         objpoints = []  # 3d point in real world space
         imgpoints = []  # 2d points in image plane.
-
+        count_find = 0
         is_read = True
         while is_read:
             # print(counter)
             counter += 1
+            tot.setText(str(counter)+'/'+str(int(v_size)))
             is_read, img = video_capture.read()
             if not counter % jump:
                 print('in ', counter)
@@ -145,13 +150,14 @@ class MainClass:
 
                 # If found, add object points, image points (after refining them)
                 if ret == True:
+                    count_find+=1
                     print('+')
-
+                    num.setText(str(count_find))
 
                     objpoints.append(objp)
                     corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
                     imgpoints.append(corners)
-
+                    # self.obj.checkBox_corn.
                     # Draw and display the corners
                     cv.drawChessboardCorners(img, chessboardSize, corners2, ret)
             #         cv.imshow('img', img)
@@ -160,12 +166,13 @@ class MainClass:
             #             print('-')
             #         print(counter," / 4150")
             #         break
+
                 image = cv.resize(img, (412, 262))
                 # cv.imshow('Video', self.image)
                 # cv.waitKey(1000)
                 image = QtGui.QImage(image.data, image.shape[1], image.shape[0],QtGui.QImage.Format_RGB888).rgbSwapped()
                 widget.setPixmap(QtGui.QPixmap.fromImage(image))
-
+        stat.setText('Завершено')
         cv.destroyAllWindows()
         # print(objpoints, imgpoints, frameSize)
         if len(objpoints) != 0:
